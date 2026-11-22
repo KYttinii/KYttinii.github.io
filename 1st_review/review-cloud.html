@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Back to the surface — 1기 후기 키워드</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  /* ───────── 설정은 아래 <script> 맨 위에서 ───────── */
+  :root{
+    --surface:#15507a; --deep:#03101b;
+    --ink:#eaf4f8; --ink-dim:rgba(234,244,248,.62); --ink-faint:rgba(234,244,248,.32);
+    --aqua:#7fd0e6; --teal:#3aa3c4; --mist:#b8dbe6;
+    --line:rgba(234,244,248,.14);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Pretendard",-apple-system,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+    color:var(--ink);
+    background:linear-gradient(180deg,var(--surface) 0%,#0b2c47 38%,var(--deep) 100%);
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* 수면 빛 */
+  body::before{
+    content:"";position:fixed;inset:0 0 auto 0;height:40vh;pointer-events:none;
+    background:radial-gradient(ellipse 60% 100% at 50% 0%,rgba(160,220,240,.18),transparent 70%);
+  }
+
+  .app{position:relative;z-index:1;height:100vh;display:grid;
+    grid-template-columns:1fr minmax(300px,26vw);grid-template-rows:auto 1fr auto;
+    gap:0 3vw;padding:4vh 4vw 3vh}
+
+  header{grid-column:1 / -1;display:flex;justify-content:space-between;align-items:flex-end;
+    padding-bottom:2.4vh;border-bottom:1px solid var(--line)}
+  .eyebrow{font:500 12px/1 ui-monospace,"SF Mono",Menlo,monospace;letter-spacing:.22em;
+    color:var(--aqua);text-transform:uppercase;margin-bottom:1.4vh}
+  h1{font-weight:700;font-size:clamp(28px,3.4vw,56px);letter-spacing:-.02em;line-height:1.1}
+  h1 em{font-style:normal;color:var(--aqua)}
+  .stats{display:flex;gap:3vw;text-align:right}
+  .stat .label{font:500 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.18em;color:var(--ink-dim);margin-bottom:1vh}
+  .stat .value{font-weight:700;font-size:clamp(24px,2.6vw,44px);font-variant-numeric:tabular-nums;line-height:1}
+  .stat .value small{font-size:.45em;font-weight:500;color:var(--ink-dim);margin-left:.2em}
+  .stat .value.bump{animation:bump .6s ease}
+  @keyframes bump{40%{transform:scale(1.18);color:var(--aqua)}}
+
+  /* 워드 클라우드 */
+  #cloud{position:relative;overflow:hidden}
+  .w{position:absolute;left:0;top:0;white-space:nowrap;line-height:1;
+    transition:transform 1.1s cubic-bezier(.2,.8,.2,1),opacity .6s ease;will-change:transform}
+  .w span{display:inline-block;font-weight:700;letter-spacing:-.02em}
+  .w.new span{animation:rise 1.4s cubic-bezier(.2,.8,.2,1)}
+  @keyframes rise{
+    0%{opacity:0;transform:translateY(60px) scale(.6);filter:blur(6px)}
+    60%{opacity:1;filter:blur(0);text-shadow:0 0 28px rgba(127,208,230,.9)}
+    100%{transform:none;text-shadow:none}
+  }
+  .empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--ink-faint);
+    font-size:clamp(16px,1.6vw,24px);line-height:1.6}
+
+  /* 오른쪽 */
+  aside{display:flex;flex-direction:column;gap:3vh;padding-top:3vh;min-height:0}
+  .join{display:flex;gap:1.4vw;align-items:center;padding:2vh 1.4vw;border:1px solid var(--line);
+    border-radius:14px;background:rgba(255,255,255,.04)}
+  .join img{width:clamp(88px,8vw,140px);height:auto;aspect-ratio:1;border-radius:8px;background:#eaf4f8;padding:6px}
+  .join .t{font-size:clamp(14px,1.15vw,19px);font-weight:600;line-height:1.45}
+  .join .u{margin-top:.8vh;font:500 clamp(12px,.95vw,15px)/1.3 ui-monospace,Menlo,monospace;color:var(--aqua);word-break:break-all}
+
+  .moments{flex:1;min-height:0;display:flex;flex-direction:column}
+  .moments .label{font:500 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.18em;color:var(--ink-dim);margin-bottom:2vh}
+  .quote{position:relative;flex:1}
+  .quote p{word-break:keep-all;position:absolute;inset:0 0 auto 0;font-size:clamp(17px,1.5vw,26px);line-height:1.55;font-weight:500;
+    opacity:0;transform:translateY(14px);transition:opacity .8s ease,transform .8s ease}
+  .quote p.on{opacity:1;transform:none}
+  .quote p::before{content:"“";display:block;font-size:2.4em;line-height:.6;color:var(--teal);margin-bottom:.15em}
+  .dots{display:flex;gap:6px;flex-wrap:wrap;margin-top:1vh}
+  .dots i{width:6px;height:6px;border-radius:50%;background:var(--ink-faint)}
+  .dots i.on{background:var(--aqua)}
+
+  footer{grid-column:1 / -1;display:flex;justify-content:space-between;align-items:center;
+    padding-top:2vh;border-top:1px solid var(--line);
+    font:500 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.16em;color:var(--ink-faint)}
+  .status{display:flex;align-items:center;gap:8px}
+  .status i{width:7px;height:7px;border-radius:50%;background:#5fd39a;box-shadow:0 0 0 0 rgba(95,211,154,.6);animation:ping 2s infinite}
+  .status.err i{background:#f0a35e;animation:none}
+  @keyframes ping{70%{box-shadow:0 0 0 8px rgba(95,211,154,0)}100%{box-shadow:0 0 0 0 rgba(95,211,154,0)}}
+
+  /* 떠오르는 기포 */
+  .bubbles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .bubbles b{position:absolute;bottom:-20px;border-radius:50%;border:1px solid rgba(200,235,245,.35);
+    background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.35),rgba(255,255,255,.04) 60%);
+    animation:up linear infinite}
+  @keyframes up{to{transform:translate(var(--dx),-110vh)}}
+
+  @media (max-width:860px){
+    body{overflow:auto}
+    .app{height:auto;min-height:100vh;grid-template-columns:1fr;grid-template-rows:auto 60vh auto auto}
+    header{flex-direction:column;align-items:flex-start;gap:2vh}
+    .stats{text-align:left}
+    .quote{min-height:160px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .w,.quote p{transition:none}.w.new span,.bubbles b,.status i{animation:none}
+  }
+</style>
+</head>
+<body>
+<div class="bubbles" id="bubbles"></div>
+
+<div class="app">
+  <header>
+    <div>
+      <div class="eyebrow">↑ Back to the surface · 26.11.22 1기 후기</div>
+      <h1>오늘의 <em>키워드</em></h1>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="label">DIVERS</div><div class="value" id="count">0<small>명</small></div></div>
+      <div class="stat"><div class="label">AVG DEPTH</div><div class="value" id="avg">–<small>/ 5</small></div></div>
+    </div>
+  </header>
+
+  <main id="cloud"><div class="empty" id="empty">아직 수면이 잔잔해요.<br>첫 후기를 남겨 주세요 🫧</div></main>
+
+  <aside>
+    <div class="moments">
+      <div class="label">수강생 한마디</div>
+      <div class="quote" id="quote"></div>
+      <div class="dots" id="dots"></div>
+    </div>
+  </aside>
+
+  <footer>
+    <span>AI × PORTFOLIO WORKSHOP · ELAIN2.GITHUB.IO</span>
+    <span>@FREE.YOUNG.510</span>
+  </footer>
+</div>
+
+<script>
+/* 1기 후기(3명)에서 뽑은 키워드 — count가 클수록 크게 보여요 */
+const DATA = {
+  count: 3,
+  avg: 5.0,
+  words: [
+    { text: "신세계", count: 6 },
+    { text: "가능성확보", count: 6 },
+    { text: "그레이트", count: 6 },
+    { text: "혼자할수있는힘", count: 4 },
+    { text: "세심함", count: 4 },
+    { text: "클로드", count: 3 },
+    { text: "크롬자동화", count: 3 },
+    { text: "무료웹사이트", count: 3 },
+    { text: "친절한설명", count: 3 },
+    { text: "커스텀도메인", count: 2 },
+    { text: "깃허브", count: 2 },
+    { text: "내홈페이지", count: 2 },
+    { text: "AI챗봇", count: 1 },
+    { text: "예약기능", count: 1 },
+    { text: "웹게임", count: 1 },
+    { text: "첫배포", count: 1 }
+  ],
+  moments: [
+    "아예 아무것도 몰랐을 땐 홈페이지 만드는 게 막막했는데, 무료 웹사이트를 만드는 법을 알게 되고 수업 이후 내가 혼자 할 수 있는 힘을 길러 준 것이 너무 좋았다.",
+    "수강생 한 명 한 명 세심하게 봐줘요. 설명도 잘해줘요.",
+    "클로드 - 크롬 자동화"
+  ]
+};
+const QUOTE_MS = 7000;
+const $ = (id) => document.getElementById(id);
+const cloud = $("cloud");
+const els = new Map();
+let lastData = { count: 0, avg: null, words: [], moments: [] };
+
+/* ───── 워드 클라우드 배치 (나선형으로 겹치지 않게) ───── */
+const COLORS = ["#ffffff", "#bfe8f3", "#7fd0e6", "#9cc9d8", "#3aa3c4", "#d7eef5"];
+function colorFor(text, rank){
+  if (rank === 0) return "#ffffff";
+  let h = 0; for (const c of text) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return COLORS[1 + (h % (COLORS.length - 1))];
+}
+
+function layout(words){
+  const W = cloud.clientWidth, H = cloud.clientHeight;
+  if (!W || !H) return;
+  $("empty").style.display = words.length ? "none" : "grid";
+
+  const max = words.length ? words[0].count : 1;
+  const min = words.length ? words[words.length - 1].count : 1;
+  const n = words.length;
+  const maxF = Math.min(H * 0.26, W * 0.16, n <= 3 ? 140 : n <= 10 ? 110 : 120);
+  const minF = Math.max(18, maxF * 0.24);
+
+  const placed = [];
+  const seen = new Set();
+  const cx = W / 2, cy = H / 2, ratio = W / H;
+
+  words.forEach((w, rank) => {
+    seen.add(w.text);
+    let el = els.get(w.text);
+    const isNew = !el;
+    if (isNew){
+      el = document.createElement("div");
+      el.className = "w new";
+      el.style.transition = "none";
+      const sp = document.createElement("span");
+      sp.textContent = w.text;
+      el.appendChild(sp);
+      cloud.appendChild(el);
+      els.set(w.text, el);
+      setTimeout(() => el.classList.remove("new"), 1500);
+    }
+    const t = max === min ? (n <= 6 ? 0.7 : 0.35) : Math.pow((w.count - min) / (max - min), 1.3);
+    let size = minF + (maxF - minF) * t;
+    const span = el.firstChild;
+    span.style.color = colorFor(w.text, rank);
+    span.style.fontWeight = t > 0.5 ? 800 : t > 0.2 ? 700 : 600;
+
+    let pos = null;
+    for (let attempt = 0; attempt < 4 && !pos; attempt++){
+      span.style.fontSize = size + "px";
+      let bw = el.offsetWidth, bh = el.offsetHeight;
+      if (bw > W * 0.92){ size *= (W * 0.92) / bw; span.style.fontSize = size + "px"; bw = el.offsetWidth; bh = el.offsetHeight; }
+      const pad = Math.max(4, size * 0.12);
+      for (let i = 0, a = Math.random() * 6; i < 2600; i++, a += 0.32){
+        const r = 2.2 * a;
+        const x = cx + r * Math.cos(a) * Math.max(1, ratio * 0.9) - bw / 2;
+        const y = cy + r * Math.sin(a) - bh / 2;
+        if (x < 0 || y < 0 || x + bw > W || y + bh > H){ if (r > Math.max(W, H)) break; continue; }
+        const box = { x: x - pad, y: y - pad, w: bw + pad * 2, h: bh + pad * 2 };
+        if (!placed.some(p => box.x < p.x + p.w && box.x + box.w > p.x && box.y < p.y + p.h && box.y + box.h > p.y)){
+          placed.push(box); pos = { x, y }; break;
+        }
+      }
+      if (!pos) size *= 0.8;
+    }
+    if (pos){
+      el.style.opacity = 1;
+      el.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+      if (isNew) { void el.offsetWidth; el.style.transition = ""; }
+    } else {
+      el.style.opacity = 0;
+    }
+  });
+
+  // 사라진 단어 정리
+  for (const [text, el] of els){
+    if (!seen.has(text)){ el.style.opacity = 0; setTimeout(() => el.remove(), 600); els.delete(text); }
+  }
+}
+
+/* ───── 숫자 ───── */
+function setStat(id, html){
+  const el = $(id);
+  if (el.innerHTML === html) return;
+  el.innerHTML = html;
+  el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump");
+}
+
+/* ───── 문장 티커 ───── */
+let quoteIdx = 0, quoteTimer = null, quotes = [];
+function renderQuotes(list){
+  const newest = list[0] !== quotes[0];
+  quotes = list;
+  const box = $("quote");
+  box.innerHTML = "";
+  quotes.forEach(q => { const p = document.createElement("p"); p.textContent = q; box.appendChild(p); });
+  $("dots").innerHTML = quotes.slice(0, 20).map(() => "<i></i>").join("");
+  if (newest) quoteIdx = 0;
+  showQuote();
+  clearInterval(quoteTimer);
+  quoteTimer = setInterval(() => { quoteIdx = (quoteIdx + 1) % Math.max(1, quotes.length); showQuote(); }, QUOTE_MS);
+}
+function showQuote(){
+  const ps = $("quote").children, ds = $("dots").children;
+  for (let i = 0; i < ps.length; i++) ps[i].classList.toggle("on", i === quoteIdx);
+  for (let i = 0; i < ds.length; i++) ds[i].classList.toggle("on", i === quoteIdx);
+}
+
+/* ───── 렌더 ───── */
+function render(d){
+  setStat("count", `${d.count}<small>명</small>`);
+  setStat("avg", `${d.avg == null ? "–" : d.avg.toFixed(1)}<small>/ 5</small>`);
+  const wordsChanged = JSON.stringify(d.words) !== JSON.stringify(lastData.words);
+  if (wordsChanged) layout(d.words);
+  if (JSON.stringify(d.moments) !== JSON.stringify(quotes)) renderQuotes(d.moments);
+  lastData = d;
+}
+
+let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => layout(lastData.words), 200); });
+window.addEventListener("keydown", e => {
+  if (e.key === "f" || e.key === "F"){ document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+});
+
+const start = () => render(DATA);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(start); else start();
+</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+[
+  {
+    "full": "../assets/img/03-bubble-ring.jpg",
+    "thumb": "images/thumbs/03-bubble-ring.jpg",
+    "title": "Bubble ring",
+    "alt": "A freediver in pink fins and cap releasing a bubble ring beside the guide rope, seen from above",
+    "orientation": "portrait"
+  },
+  {
+    "full": "../assets/img/01-surface-line.jpg",
+    "thumb": "images/thumbs/01-surface-line.jpg",
+    "title": "Surface line",
+    "alt": "A diver swimming along the pool floor holding an underwater camera, the water surface mirrored above",
+    "orientation": "portrait"
+  },
+  {
+    "full": "../assets/img/06-two-divers-diagonal.jpg",
+    "thumb": "images/thumbs/06-two-divers-diagonal.jpg",
+    "title": "Two divers, one diagonal",
+    "alt": "Two freedivers in black wetsuits gliding on a diagonal along lane lines in a deep blue pool",
+    "orientation": "portrait"
+  },
+  {
+    "full": "../assets/img/04-at-the-surface.jpg",
+    "thumb": "images/thumbs/04-at-the-surface.jpg",
+    "title": "At the surface",
+    "alt": "A diver at the water's surface in a pink cap and mask, smiling and making a peace sign while holding the buoy",
+    "orientation": "landscape"
+  },
+  {
+    "full": "../assets/img/05-temple-pose.jpg",
+    "thumb": "images/thumbs/05-temple-pose.jpg",
+    "title": "Temple floor",
+    "alt": "A diver in a pink cap posing playfully on the floor of a pool decorated like an Egyptian temple",
+    "orientation": "portrait"
+  },
+  {
+    "full": "../assets/img/02-camera-diver.jpg",
+    "thumb": "images/thumbs/02-camera-diver.jpg",
+    "title": "The one behind the camera",
+    "alt": "Close-up of a diver pointing an underwater camera straight at the lens",
+    "orientation": "portrait"
+  }
+]

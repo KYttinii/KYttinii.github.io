@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Photography — Kayoung Lee (@free.young.510)</title>
+<meta name="description" content="Underwater and freediving photography by Kayoung Lee (@free.young.510).">
+<meta property="og:title" content="Below the surface — photography by @free.young.510">
+<meta property="og:image" content="../assets/img/03-bubble-ring.jpg">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<!--
+  Gallery structure (thumbnail grid → lightbox → EXIF) adapted from the idea of
+  rampatra/photography; rebuilt from scratch in plain HTML/CSS/JS on the
+  다이빙캣 design system. No template code is reused.
+-->
+<style>
+/* ── 다이빙캣 tokens (keep in sync with /index.html) ─────────── */
+:root{
+  --surface:#F5F8F9; --surface-raised:#FFFFFF; --surface-shallow:#E3F1F4;
+  --ink:#0B0F12; --ink-muted:#4F5B63; --line:#D5DFE3; --line-strong:#76858D;
+  --pool:#0E6D9E; --on-pool:#FFFFFF; --aqua:#44BBD8; --deep:#033162;
+  --pink:#E8508C; --on-pink:#0B0F12; --pink-ink:#C42F6E; --marker:#C8E63C;
+  --font-sans:"Pretendard Variable","Pretendard","Apple SD Gothic Neo",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",monospace;
+  --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-6:24px;--space-8:32px;--space-12:48px;--space-16:64px;--space-24:96px;
+  --radius-sm:4px;--radius-md:12px;--radius-pill:999px;
+  --max:1120px;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --surface:#0D0F10; --surface-raised:#16191B; --surface-shallow:#142226;
+  --ink:#EEF3F4; --ink-muted:#98A4AA; --line:#2A3034; --line-strong:#5E6E76;
+  --pool:#5CC0E3; --on-pool:#0B0F12; --deep:#1B5E86; --pink:#F06A9E; --pink-ink:#F06A9E;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --surface:#0D0F10; --surface-raised:#16191B; --surface-shallow:#142226;
+    --ink:#EEF3F4; --ink-muted:#98A4AA; --line:#2A3034; --line-strong:#5E6E76;
+    --pool:#5CC0E3; --on-pool:#0B0F12; --deep:#1B5E86; --pink:#F06A9E; --pink-ink:#F06A9E;
+    color-scheme:dark;
+  }
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--surface);color:var(--ink);font-family:var(--font-sans);font-size:17px;line-height:28px;-webkit-font-smoothing:antialiased;word-break:keep-all}
+img{display:block;max-width:100%;height:auto}
+a{color:var(--pool);text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{color:var(--pink-ink)}
+:focus-visible{outline:2px solid var(--pool);outline-offset:2px;border-radius:var(--radius-sm)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--space-6)}
+.label{font-family:var(--font-mono);font-size:12px;line-height:16px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted)}
+
+/* nav — same as the main site */
+.nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:var(--space-6);height:60px}
+.mark{font-weight:800;font-size:18px;letter-spacing:-.02em;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:var(--space-2)}
+.mark::before{content:"";width:10px;height:10px;border-radius:50%;border:2px solid var(--pool)}
+.back{margin-left:auto;font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);text-decoration:none}
+.back:hover{color:var(--ink)}
+.theme{font:inherit;font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;background:none;border:1px solid var(--line-strong);color:var(--ink);border-radius:var(--radius-pill);padding:2px var(--space-3);cursor:pointer}
+
+/* header — surface line at one third */
+.head{position:relative;padding:var(--space-16) 0 var(--space-12)}
+.surface{border:0;height:1px;background:var(--line);margin:0 calc(50% - 50vw) var(--space-8)}
+.head h1{margin:var(--space-3) 0 var(--space-6);font-size:clamp(44px,6.4vw,72px);line-height:1;font-weight:800;letter-spacing:-.035em}
+.head p{margin:0;max-width:56ch;color:var(--ink-muted)}
+.count{font-family:var(--font-mono);font-size:40px;line-height:44px;font-weight:500;letter-spacing:-.02em;color:var(--pool)}
+.head .row{display:flex;justify-content:space-between;align-items:end;gap:var(--space-8);flex-wrap:wrap}
+
+/* grid — staggered columns, square corners, generous gaps */
+.grid{columns:3 280px;column-gap:var(--space-6);padding-bottom:var(--space-24)}
+.shot{break-inside:avoid;margin:0 0 var(--space-8)}
+.shot button{all:unset;display:block;cursor:zoom-in;width:100%;position:relative}
+.shot img{width:100%;background:var(--surface-shallow);transition:opacity .3s}
+.shot button:hover img{opacity:.88}
+.shot button:focus-visible{outline:2px solid var(--pool);outline-offset:4px}
+.shot figcaption{display:flex;justify-content:space-between;gap:var(--space-3);margin-top:var(--space-2)}
+.shot .n{font-family:var(--font-mono);font-size:12px;color:var(--ink-muted)}
+@media (max-width:640px){.grid{columns:2 140px;column-gap:var(--space-4)}.shot{margin-bottom:var(--space-6)}}
+
+/* lightbox — near-black, never navy */
+dialog{padding:0;border:0;max-width:none;max-height:none;width:100vw;height:100dvh;background:rgb(11 15 18 / .96);color:#EEF3F4}
+dialog::backdrop{background:transparent}
+.lb{display:grid;grid-template-rows:auto 1fr auto;height:100%}
+.lb-top,.lb-bot{display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-4) var(--space-6)}
+.lb-top .label,.lb-bot .label{color:#98A4AA}
+.lb-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:0;padding:0 var(--space-16)}
+.lb-stage img{max-width:100%;max-height:100%;object-fit:contain}
+.lb-btn{font:inherit;font-family:var(--font-mono);font-size:13px;letter-spacing:.06em;color:#EEF3F4;background:none;border:1px solid #5E6E76;border-radius:var(--radius-pill);padding:var(--space-1) var(--space-3);cursor:pointer}
+.lb-btn:hover{border-color:var(--aqua);color:var(--aqua)}
+.lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;padding:0;border-radius:50%}
+.lb-prev{left:var(--space-4)} .lb-next{right:var(--space-4)}
+.lb-title{font-weight:600;font-size:17px}
+.exif{display:flex;gap:var(--space-4);flex-wrap:wrap;font-family:var(--font-mono);font-size:12px;color:#B9C7CE}
+.exif span::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--marker);margin-right:var(--space-2);vertical-align:middle}
+@media (max-width:640px){.lb-stage{padding:0 var(--space-2)}.lb-prev,.lb-next{top:auto;bottom:-52px;transform:none}}
+
+footer{border-top:1px solid var(--line);padding:var(--space-8) 0 var(--space-12)}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);flex-wrap:wrap}
+.up{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none}
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="Main">
+  <div class="wrap">
+    <a class="mark" href="../">다이빙캣</a>
+    <a class="back" href="../#dive">← Portfolio</a>
+    <button class="theme" type="button" id="theme" aria-label="Toggle colour theme">Surface</button>
+  </div>
+</nav>
+
+<main id="top">
+  <header class="head">
+    <div class="wrap">
+      <p class="label">Photography · <a href="https://www.instagram.com/free.young.510/" target="_blank" rel="noopener">@free.young.510</a></p>
+      <h1>Below the surface</h1>
+      <hr class="surface">
+      <div class="row">
+        <p>Pool and depth sessions, shot on one breath. Freedivers, bubble rings and the light that bends under the water line.</p>
+        <div><div class="count" id="count">—</div><div class="label">Frames</div></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="grid" id="grid" aria-live="polite"></div>
+  </div>
+</main>
+
+<dialog id="lb" aria-label="Photo viewer">
+  <div class="lb">
+    <div class="lb-top">
+      <span class="label" id="lb-pos"></span>
+      <button class="lb-btn" type="button" id="lb-close">Close · Esc</button>
+    </div>
+    <div class="lb-stage">
+      <button class="lb-btn lb-prev" type="button" id="lb-prev" aria-label="Previous photo">←</button>
+      <img id="lb-img" alt="">
+      <button class="lb-btn lb-next" type="button" id="lb-next" aria-label="Next photo">→</button>
+    </div>
+    <div class="lb-bot">
+      <span class="lb-title" id="lb-title"></span>
+      <span class="exif" id="lb-exif"></span>
+    </div>
+  </div>
+</dialog>
+
+<footer>
+  <div class="wrap">
+    <span class="label">Photos ©free.young.510</span>
+    <a class="up" href="#top">수면 위로 ↑</a>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/exif-js@2.3.0/exif.js" defer></script>
+<script>
+(function(){
+  /* theme — shared with the main site via localStorage */
+  var root=document.documentElement, tbtn=document.getElementById('theme');
+  try{var s=localStorage.getItem('theme'); if(s) root.dataset.theme=s}catch(e){}
+  function dark(){return root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches}
+  function tl(){tbtn.textContent=dark()?'Deep':'Surface'} tl();
+  tbtn.onclick=function(){root.dataset.theme=dark()?'light':'dark';try{localStorage.setItem('theme',root.dataset.theme)}catch(e){};tl()};
+
+  var grid=document.getElementById('grid'), photos=[], cur=0;
+  var lb=document.getElementById('lb'), img=document.getElementById('lb-img');
+  var pad=function(n){return String(n).padStart(2,'0')};
+
+  fetch('photos.json').then(function(r){return r.json()}).then(function(list){
+    photos=list;
+    document.getElementById('count').textContent=pad(list.length);
+    list.forEach(function(p,i){
+      var f=document.createElement('figure'); f.className='shot';
+      f.innerHTML='<button type="button" aria-label="Open photo: '+esc(p.title)+'"><img loading="lazy" decoding="async" alt=""></button>'+
+        '<figcaption><span class="label">'+esc(p.title)+'</span><span class="n">'+pad(i+1)+'</span></figcaption>';
+      var t=f.querySelector('img'); t.src=p.thumb||p.full; t.alt=p.alt||p.title;
+      f.querySelector('button').onclick=function(){open(i)};
+      grid.appendChild(f);
+    });
+  }).catch(function(){grid.innerHTML='<p class="label">Could not load photos.json</p>'});
+
+  function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+  function exifLine(p){
+    var box=document.getElementById('lb-exif'); box.innerHTML='';
+    var add=function(t){if(!t)return;var s=document.createElement('span');s.textContent=t;box.appendChild(s)};
+    if(p.settings){ (Array.isArray(p.settings)?p.settings:[p.settings]).forEach(add); return }
+    if(!window.EXIF) return;
+    var probe=new Image(); probe.onload=function(){
+      EXIF.getData(probe,function(){
+        var g=function(k){return EXIF.getTag(probe,k)};
+        var fn=g('FNumber'), ex=g('ExposureTime'), iso=g('ISOSpeedRatings'), model=g('Model'), fl=g('FocalLength');
+        if(photos[cur]!==p) return;
+        add(model);
+        if(fl) add(Math.round(Number(fl))+'mm');
+        if(fn) add('ƒ/'+Number(fn).toFixed(1).replace(/\.0$/,''));
+        if(ex) add(Number(ex)>=1?ex+'s':'1/'+Math.round(1/Number(ex))+'s');
+        if(iso) add('ISO '+iso);
+      });
+    }; probe.src=p.full;
+  }
+
+  function show(i){
+    cur=(i+photos.length)%photos.length; var p=photos[cur];
+    img.src=p.full; img.alt=p.alt||p.title;
+    document.getElementById('lb-title').textContent=p.title||'';
+    document.getElementById('lb-pos').textContent=pad(cur+1)+' / '+pad(photos.length);
+    exifLine(p);
+  }
+  function open(i){show(i); if(lb.showModal) lb.showModal(); else lb.setAttribute('open','')}
+  function close(){lb.close? lb.close() : lb.removeAttribute('open')}
+
+  document.getElementById('lb-prev').onclick=function(){show(cur-1)};
+  document.getElementById('lb-next').onclick=function(){show(cur+1)};
+  document.getElementById('lb-close').onclick=close;
+  lb.addEventListener('keydown',function(e){
+    if(e.key==='ArrowLeft') show(cur-1);
+    if(e.key==='ArrowRight') show(cur+1);
+  });
+  lb.addEventListener('click',function(e){ if(e.target.classList.contains('lb-stage')) close() });
+  var x0=null;
+  lb.addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});
+  lb.addEventListener('touchend',function(e){ if(x0===null)return; var dx=e.changedTouches[0].clientX-x0; if(Math.abs(dx)>50) show(cur+(dx<0?1:-1)); x0=null });
+})();
+</script>
+</body>
+</html>
